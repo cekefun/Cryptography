@@ -33,20 +33,6 @@ class Playfair:
 		self.BestResult = self.key
 		trips = 0
 
-		print(self.key)
-		print(self.up())
-		print(self.down())
-		print(self.left())
-		print(self.right())
-		print(self.turnRow())
-		print(self.turnCol())
-		print(self.switchRows())
-		print(self.switchCols())
-		print(self.swap2())
-		print(self.swap2(5))
-		print(self.swap2(2))
-		print(self.swap3())
-
 		while True:
 			trips +=1
 			print(trips)
