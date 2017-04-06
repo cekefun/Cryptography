@@ -1,6 +1,7 @@
 import sys
 import csv
 import random
+import copy
 
 class Playfair:
 	stats = {}
@@ -31,6 +32,21 @@ class Playfair:
 		self.MaxScore = score
 		self.BestResult = self.key
 		trips = 0
+
+		print(self.key)
+		print(self.up())
+		print(self.down())
+		print(self.left())
+		print(self.right())
+		print(self.turnRow())
+		print(self.turnCol())
+		print(self.switchRows())
+		print(self.switchCols())
+		print(self.swap2())
+		print(self.swap2(5))
+		print(self.swap2(2))
+		print(self.swap3())
+
 		while True:
 			trips +=1
 			print(trips)
@@ -62,6 +78,7 @@ class Playfair:
 		self.decode()
 		print(self.key)
 		print("".join(self.decoded))
+
 
 
 
@@ -141,6 +158,7 @@ class Playfair:
 
 		for i in amount.keys():
 			if(i not in self.stats):
+				score += 1
 				continue
 			score += abs(amount[i]/len(self.decoded) - self.stats[i])
 
@@ -226,7 +244,7 @@ class Playfair:
 
 	def swap2(self,amount=1):
 		#swaps 2 random places.
-		result = self.key
+		result = copy.deepcopy(self.key)
 		for i in range(amount):
 			pair1 = [0,0]
 			pair1[0] = random.randint(0,4)
@@ -242,7 +260,7 @@ class Playfair:
 		return result
 
 	def swap3(self):
-		result = self.key
+		result = copy.deepcopy(self.key)
 		pair1 = [0,0]
 		pair1 = [0,0]
 		pair1[0] = random.randint(0,4)
