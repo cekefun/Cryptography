@@ -34,7 +34,6 @@ class Playfair:
 		trips = 0
 
 		while True:
-			trips +=1
 			print(trips)
 			possibles = [self.up(),self.down(),self.left(),self.right(),self.turnRow(),self.turnCol(),self.switchRows(),self.switchCols(),self.swap2(),self.swap2(5), self.swap2(2),self.swap3()]
 			scores = []
@@ -43,21 +42,24 @@ class Playfair:
 				self.decode()
 				scores.append(self.score())
 
-			print(scores)
+			print(self.BestResult)
 			print(self.MaxScore)
 
 			choice = 0
-			mini = 100000
+			mini = 0
 			for i in range(len(scores)):
-				if scores[i] < mini:
+				if scores[i] > mini:
 					mini = scores[i]
 					choice = i
-			if(self.MaxScore <= mini):
-				break
-
-			self.key = possibles[choice]
-			self.BestResult = self.key
-			self.MaxScore = mini
+			if(self.MaxScore > mini):
+				trips += 1
+				if(self.correct(self.BestResult) or trips == 10000):
+					break
+			else:
+				trips = 0
+				self.key = possibles[choice]
+				self.BestResult = self.key
+				self.MaxScore = mini
 
 		print(trips)
 		self.key = self.BestResult
@@ -67,7 +69,15 @@ class Playfair:
 
 
 
-
+	def correct(self,matrix):
+		toCheck = matrix[-1]
+		last = 0
+		for i in toCheck:
+			if last != 0:
+				if i < last:
+					return False
+			last = i
+		return True
 
 	def getStats(self):
 		reader = csv.reader(open('StatsEN.csv','r'))
@@ -115,9 +125,9 @@ class Playfair:
 			if(a[0]!=b[0] and a[1]!= b[1]):
 				result = self.key[a[0]][b[1]] + self.key[b[0]][a[1]]
 			if(a[0]==b[0]):
-				result = self.key[a[0]][(a[1]+1)%5] + self.key[b[0]][(b[1]+1)%5]
+				result = self.key[a[0]][a[1]-1] + self.key[b[0]][b[1]-1]
 			if(a[1]==b[1]):
-				result = self.key[(a[0]+1)%5][a[1]] + self.key[(b[0]+1)%5][b[1]]
+				result = self.key[a[0]-1][a[1]] + self.key[b[0]-1][b[1]]
 			self.decoded.append(result)
 
 	def generateKey(self):
@@ -135,18 +145,10 @@ class Playfair:
 
 	def score(self):
 		score = 0
-		amount = {}
 		for i in self.decoded:
-
-			if not (i in amount):
-				amount[i] = 0
-			amount[i]+=1
-
-		for i in amount.keys():
 			if(i not in self.stats):
-				score += 1
 				continue
-			score += abs(amount[i]/len(self.decoded) - self.stats[i])
+			score += self.stats[i]
 
 		return score
 
