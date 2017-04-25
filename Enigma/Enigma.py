@@ -67,6 +67,7 @@ class Enigma:
 			toDecode = chr(toDecode)
 			toDecode = revMap[toDecode]
 		self.turn()
+		return toDecode
 
 
 def main():
@@ -81,9 +82,7 @@ def main():
 	e.loadCrypt("Crib.txt")
 	e.setRotors("r0.txt","r1.txt","r2.txt")
 	e.setState('B','A','A')
-	print (e.state)
 	e.decode('A')
-	print (e.state)
 
 
 if __name__ == "__main__":
