@@ -1,3 +1,6 @@
+from collections import defaultdict
+from itertools import permutations
+
 class Enigma:
 	Rotor = {}
 	Reflector = {}
@@ -34,11 +37,13 @@ class Enigma:
 		self.crib = openfile.read()
 
 	def setRotors(self,r0,r1,r2):
+		self.rotors = []
 		self.rotors.append(r0)
 		self.rotors.append(r1)
 		self.rotors.append(r2)
 
 	def setState(self,s0,s1,s2):
+		self.state = {}
 		self.state[self.rotors[0]] = ord(s0) - ord('A')
 		self.state[self.rotors[1]] = ord(s1) - ord('A')
 		self.state[self.rotors[2]] = ord(s2) - ord('A')
@@ -70,6 +75,48 @@ class Enigma:
 		return toDecode
 
 
+class Bombe:
+	def __init__(self,Enigma):
+		self.e = Enigma
+		self.graph = defaultdict(list)
+		self.cycles = defaultdict(list)
+		self.possibles = []
+	def makeGraph(self):
+		crib = self.e.crib
+		check = self.e.code[:len(crib)]
+		for i in range(len(crib)):
+			self.graph[crib[i]].append((check[i],i))
+			self.graph[check[i]].append((crib[i],i))
+
+	def crack(self):
+		for i in self.e.alfabet:
+			for j in self.e.alfabet:
+				for k in self.e.alfabet:
+					for perm in permutations(self.e.Rotor.keys(),3):
+						success = True
+						for key,value in self.cycles.items():
+							if(not success):
+								break
+							for loop in value:
+								ch = key
+								for path in loop:
+									self.e.setRotors(perm[0],perm[1],perm[2])
+									self.e.setState(i,j,k)
+									for foo in range(path):
+										self.e.turn()
+									ch = self.e.decode(ch)
+								if(ch != key):
+									success = False
+									break
+						if(success):
+							self.possibles.append([i,j,k],perm)
+
+
+
+
+
+
+
 def main():
 	e = Enigma()
 	e.loadRotor("r0.txt")
@@ -83,6 +130,21 @@ def main():
 	e.setRotors("r0.txt","r1.txt","r2.txt")
 	e.setState('B','A','A')
 	e.decode('A')
+	b = Bombe(e)
+	b.makeGraph()
+	print (b.graph)
+
+	#made on paper
+	b.cycles['V'].append([5,8,15,10,21,19,14])
+	b.cycles['V'].append([12,4,17,1])
+	b.cycles['E'].append([2,7])
+	b.cycles['B'].append([11,23])
+
+	b.crack()
+	print (b.possibles)
+
+
+
 
 
 if __name__ == "__main__":
