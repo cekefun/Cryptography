@@ -145,7 +145,19 @@ def main():
 	b.cycles['B'].append([11,23])
 
 	b.crack()
-	#print (b.possibles)
+	print (b.possibles)
+
+	for i in b.possibles:
+		result = ""
+		e.setRotors(i[1][0],i[1][1],i[1][2])
+		e.setState(i[0][0],i[0][1],i[0][2])
+		for j in e.code:
+			result += e.decode(j)
+
+		#because dEEErste
+		if result[1]==result[2] and result[2]==result[3]:
+			print(i)
+			print(result)
 
 
 
