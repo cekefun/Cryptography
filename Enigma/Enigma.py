@@ -98,18 +98,19 @@ class Bombe:
 							if(not success):
 								break
 							for loop in value:
-								ch = key
-								for path in loop:
-									self.e.setRotors(perm[0],perm[1],perm[2])
-									self.e.setState(i,j,k)
-									for foo in range(path):
-										self.e.turn()
-									ch = self.e.decode(ch)
-								if(ch != key):
-									success = False
-									break
+								for bar in self.e.alfabet:
+									ch = bar
+									for path in loop:
+										self.e.setRotors(perm[0],perm[1],perm[2])
+										self.e.setState(i,j,k)
+										for foo in range(path):
+											self.e.turn()
+										ch = self.e.decode(ch)
+									if(ch == bar):
+										success = True
+										break
 						if(success):
-							self.possibles.append([i,j,k],perm)
+							self.possibles.append([[i,j,k],perm])
 
 
 
@@ -141,8 +142,7 @@ def main():
 	b.cycles['B'].append([11,23])
 
 	b.crack()
-	print (b.possibles)
-
+	#print (b.possibles)
 
 
 
