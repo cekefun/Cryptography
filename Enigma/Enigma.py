@@ -109,6 +109,8 @@ class Bombe:
 									if(ch == bar):
 										success = True
 										break
+								if(not success):
+									break
 						if(success):
 							self.possibles.append([[i,j,k],perm])
 
