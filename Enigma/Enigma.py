@@ -98,6 +98,7 @@ class Bombe:
 							if(not success):
 								break
 							for loop in value:
+								success = False
 								for bar in self.e.alfabet:
 									ch = bar
 									for path in loop:
