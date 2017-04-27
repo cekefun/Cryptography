@@ -144,6 +144,8 @@ def main():
 	b.cycles['E'].append([2,7])
 	b.cycles['B'].append([11,23])
 
+	#did this on a server overnight
+	'''
 	b.crack()
 	print (b.possibles)
 
@@ -158,6 +160,52 @@ def main():
 		if result[1]==result[2] and result[2]==result[3]:
 			print(i)
 			print(result)
+	'''
+	f = open("results.txt",'r')
+	results = []
+	while True:
+		comb = f.readline()
+		comb = comb.rstrip()
+
+		string = f.readline()
+		string = string.rstrip()
+
+		if not (comb and string):
+			break
+
+		results.append((comb,string))
+	f.close()
+
+	trueResults = []
+
+	for possResult in results:
+		board = {}
+		success = True
+		for i in range(len(e.crib)):
+			if(e.crib[i] not in board):
+				board[e.crib[i]] = possResult[1][i]
+
+			if(possResult[1][i] not in board):
+				board[possResult[1][i]] = e.crib[i]
+
+			if(possResult[1][i] != board[e.crib[i]]):
+				print("fout in " + str(i))
+				success = False
+				break
+		if(success):
+			trueResults.append((board,possResult))
+
+	for i in trueResults:
+		print(i[1][0])
+
+		result = ""
+
+		for j in i[1][1]:
+			result.append(i[0][j])
+
+		print(result)
+
+
 
 
 
