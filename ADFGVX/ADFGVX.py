@@ -6,6 +6,7 @@ import random
 from itertools import permutations
 
 class Alphabet:
+    '''Class representing useful alphabetical operations.'''
     alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
     def letterIndex(l):
@@ -27,6 +28,7 @@ class Alphabet:
         return Alphabet.alphabet[l3]
 
 class Morse:
+    '''A class used to decode the relevant subset of morse into text.'''
     # don't need the whole alphabet
     alphabet = {
         '.-'    : 'A',
@@ -43,6 +45,7 @@ class Morse:
         return text
 
 class Frequency:
+    '''A class holding single letter frequencies for the 4 relevant languages, and operations thereon.'''
     # source for frequencies: Wikipedia
     english = {
         'a' : .08167,
@@ -176,8 +179,8 @@ class Frequency:
             
         return dict
         
-    # rate the similarity of two sorted frequencies    
     def MSE(sfreq1, sfreq2):
+        '''Rate the similarity of two frequencies using sum of squared errors.'''
         mse = 0
         
         n = min(len(sfreq1), len(sfreq2))
@@ -186,6 +189,7 @@ class Frequency:
         return mse
         
     def MSE_all(freq):
+        '''Rate the similarities of a frequency compared to the frequencies of all languages.'''
         sfreq = sorted(freq.items(), key=operator.itemgetter(1))
         sfreq.reverse() 
         
@@ -195,11 +199,11 @@ class Frequency:
         return mse     
   
     def sort_frequency(freq):
+        '''Turn a frequency dict into list of (letter, frequency) tuples sorted by descending frequency. '''
         out = sorted(freq.items(), key=operator.itemgetter(1))
         out.reverse()
         return out
     
-# Can't put these inside the class because they reference other fields...
 Frequency.all = {
     'english'   : Frequency.english,
     'dutch'     : Frequency.dutch,
@@ -210,59 +214,64 @@ Frequency.all = {
 Frequency.sorted = {c : Frequency.sort_frequency(Frequency.all[c]) for c in Frequency.all}
     
 class ADFGVX:
+    '''Class storing ADFGVX encryption tools.'''
+
     alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789'
-    
+
     def bundle(text):
-        # j = 0
-        # symbolMap = {}
+        '''
+        Turn a string characters int a list of two-character strings
+        "abcdef" → ["ab", "cd", "ef"]
+        '''
         out = []
         for i in range(0, len(text), 2):
             symbol = text[i:i+2]
-            # if symbol not in symbolMap:
-                # symbolMap[symbol] = ADFGVX.alphabet[j]
-                # j += 1
-            # out.append(symbolMap[symbol])
             out.append(symbol)
         return out
-        
+
     def apply_frequency(bundled, language):
+        '''
+        Substitute the given string of pairs as if it had the exact letter frequency of the given language.
+        This method is very naive and very unlikely to give a legible result, even if the input were correct.
+        '''
         sbfreq = Frequency.sort_frequency(Frequency.analyse(bundled))
         slfreq = Frequency.sorted[language]
-        
+
         out = bundled[:]        
         for i in range(len(sbfreq)):
             if i < len(slfreq):
                 out = substitute(out, sbfreq[i][0], slfreq[i][0])
             else:
                 out = substitute(out, sbfreq[i][0], '?')
-            
+
         return out
-            
-        
 
 
-class Column:      
-
+class Column:
+    '''Class representing Columnar transposition encryption.'''
     def checkKey(key):
+        '''Verify whether or not a certain columnar transposition key is valid.'''
         key = key.upper()
         for i in range(len(key)):
             if key[i+1:].find(key[i]) >= 0:
                 raise ValueError('Invalid key: More than one occurrence of ' + key[i])
         return key
-        
-    def getRowFunc(key):
-        key = Column.checkKey(key)                
-        sortedKey = ''.join(sorted(key))        
+
+    def getColFunc(key):
+        '''Uses the given key to generate the column transposition function.'''
+        key = Column.checkKey(key)
+        sortedKey = ''.join(sorted(key))
         return lambda i : sortedKey.find(key[i])
-        
-    def getInvRowFunc(key):
-        key = Column.checkKey(key)                
-        sortedKey = ''.join(sorted(key))        
+
+    def getInvColFunc(key):
+        '''Uses the given key to generate the inverse column transposition function.'''
+        key = Column.checkKey(key)
+        sortedKey = ''.join(sorted(key))
         return lambda i : key.find(sortedKey[i])
 
     def encypher(text, key):
-        rowFunc = Column.getRowFunc(key)
-        m = len(key)     
+        colFunc = Column.getColFunc(key)
+        m = len(key)
         l = len(text)
         
         matrix = []
@@ -275,7 +284,7 @@ class Column:
             matrix[i % m].append(text[i])
             
         for i in range(m):
-            newMatrix[rowFunc(i)] = matrix[i]
+            newMatrix[colFunc(i)] = matrix[i]
             
         s = ''
         for i in range(m):
@@ -284,14 +293,14 @@ class Column:
         return s
         
     def decypher(text, key):
-        rowFunc = Column.getRowFunc(key)
-        invRowFunc = Column.getInvRowFunc(key)
+        colFunc = Column.getColFunc(key)
+        invColFunc = Column.getInvColFunc(key)
         m = len(key)     
         l = len(text)
         # h is the minimum elements in each column
         h = int(l/m)
         # indices for the columns that hold an extra value
-        extraColumns = [rowFunc(i) for i in range(l % m)]
+        extraColumns = [colFunc(i) for i in range(l % m)]
         
         matrix = []
         newMatrix = []
@@ -310,7 +319,7 @@ class Column:
                 matrix[i].append('')
             
         for i in range(m):
-            newMatrix[invRowFunc(i)] = matrix[i]
+            newMatrix[invColFunc(i)] = matrix[i]
             
         s = ''
         for i in range(h + 1):
@@ -322,6 +331,7 @@ class Column:
 
         
 def draw(dict, barLength = 100, formatString = '{}'):
+    '''Draws a simple bar graph.'''
     ymax = 0
     for (x, y) in dict.items():
         ymax = max(ymax, y)
@@ -333,6 +343,10 @@ def draw(dict, barLength = 100, formatString = '{}'):
         print(x, ':\t', '■' * int(y * barLength / ymax), formatString.format(y))
         
 def rate_permutations(code, minLength, maxLength = None, skipChance = 0):
+    '''
+    A function that gives the results of the above function a rating.
+    The rating correlates with the likelihood of the original text being Vigenère encoded human writing.
+    '''
     if maxLength is None:
         maxLength = minLength
     startTime = time.time()
@@ -427,19 +441,3 @@ def main():
     
 if __name__ == "__main__":
 	main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

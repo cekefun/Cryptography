@@ -255,41 +255,33 @@ def main():
     openfile = open('Vigenereplus.txt', 'r')
     code = openfile.read()
 
-    if True:
-        c = "mijnnaamissibertenikspeelgraagvidespelletjesditiseenhobbymaarookeenkunstvormwaarikgraagooitverdermeegainmijnlevenalscomputerprogrammeur\
-ikbentrouwenstwintigjaaroudenikhouvancomputerspelletjesenikhouookvanlevenenvanmeisjesmetkleineborsten"
-        c = Vigenere.encypher(c, 'abcdefghi')
-        c = Column.encypher(c, 'acbd')
+    # amount of characters to print
+    charCount = 100
 
-        rate_permutations(c, 3, 6)
-    else:
-        # amount of characters to print
-        charCount = 100
+    print('Encyphered mystery:')
+    print(code[:charCount] + '...\n')
 
-        print('Encyphered mystery:')
-        print(code[:charCount] + '...\n')
+    distances = find_distances(code)
+    factors = factorise_distances(distances)
+    print('The factors of distances between repeated occurrences of three letters in a row:')
+    draw(factors, 50)
+    print('I rate these factors a', rate_factors(factors), ', which is very bad.\n')
 
-        distances = find_distances(code)
-        factors = factorise_distances(distances)
-        print('The factors of distances between repeated occurrences of three letters in a row:')
-        draw(factors, 50)
-        print('I rate these factors a', rate_factors(factors), ', which is very bad.\n')
+    print('Decyphering Column transposition with key "GBDAFCE".')
+    decolumned = Column.decypher(code, 'GBDAFCE')
+    print(decolumned[:charCount] + '...\n')
 
-        print('Decyphering Column transposition with key "GBDAFCE".')
-        decolumned = Column.decypher(code, 'GBDAFCE')
-        print(decolumned[:charCount] + '...\n')
+    distances = find_distances(decolumned)
+    factors = factorise_distances(distances)
+    print('The factors of distances between repeated occurrences of three letters in a row:')
+    draw(factors, 50)
+    print('I rate these factors a', rate_factors(factors), ', which is very good.\n')
 
-        distances = find_distances(decolumned)
-        factors = factorise_distances(distances)
-        print('The factors of distances between repeated occurrences of three letters in a row:')
-        draw(factors, 50)
-        print('I rate these factors a', rate_factors(factors), ', which is very good.\n')
+    print('(At this point: Use the Vigenère Cracking Tool to find the key)')
 
-        print('(At this point: Use the Vigenère Cracking Tool to find the key)')
-
-        print('Decyphering Vigenère with key "SASKIADECOSTER":')
-        decyphered = Vigenere.decypher(decolumned, 'SaskiadeCoster')
-        print(decyphered[:charCount] + '...\n')
+    print('Decyphering Vigenère with key "SASKIADECOSTER":')
+    decyphered = Vigenere.decypher(decolumned, 'SaskiadeCoster')
+    print(decyphered[:charCount] + '...\n')
 
 
 if __name__ == "__main__":
