@@ -84,6 +84,22 @@
 	Op deze manier kwamen we relatief snel aan een oplossing, maar was deze steeds incorrect. Toen bedachten we ons dat de letters die niet in het codewoord staan in alfabetische volgorde achter het codewoord geplaatst worden om het vierkant op te vullen. Dus voegden we de voorwaarde toe dat de laatste 5 karakters van de sleutel in alfabetische volgorde moeten staan. Dit komt niet uit voor codewoorden met meer dan 20 verschillende letters (J niet meegerekend). Daarom dat we aannemen dat de sleutel toch correct is als in dezelfde sleutel 100 keer naar een betere sleutel gezocht werd.
 	\section{ADFVGX}
 	Het is ons niet gelukt om de ADFVGX code te kraken.\\
+	Onze aanpak was vergelijkbaar aan die voor de Vigen\`ere op te lossen: Eerst proberen de lengte van de kolom sleutel te vinden, en daarna proberen de eigenlijke ADFGVX substitutie te ontdekken. Net als bij de Vigen\`ere code begon deze aanpak met het opstellen van een score-functie voor het testen van de mogelijke correctheid van een sleutel die we willen gebruiken voor het omkeren van de kolom transpositie. Aangezien de interne encryptie niet langer Vigen\`ere is, maar een willekeurige mono-alfabetische substitutie, besloten we om niet dezelfde analyse te gebruiken. In de plaats daarvan hebben we gebruik gemaakt van data over de distributies van individuele letters in de gegeven talen (Engels, Duits, Frans en Nederlands), en gebruikten we de \textit{Mean Squared Error} om deze te vergelijken met de distributie die we vonden in de verkregen code.
+	
+	Door deze techniek wederom toe te passen op een grote hoeveelheid sleutels met lengtes tussen 2 en 10, merkten we dat de hoogst scorende sleutels allemaal lengte 7 hadden, en dat deze bovendien veel betere scores behaalden dan de beste sleutels van andere lengtes. We gingen er dus van uit dat de kolom sleutel lengte 7 had. E\'en sleutel stak er bovendien tussenuit, en zou mogelijk de correcte sleutel kunnen zijn: ``GFDBEAC''.
+	
+	We hadden echter geen uitsluitsel over de exacte sleutel voor de kolom transpositie, en met enkel de kennis over de lengte konden we deze keer niet zomaar de mono-alfabetische substitutie oplossen. Omdat bij ADFGVX elk teken naar 2 letters gesubstitueerd word zorgt dit er voor dat elk klein verschil in de veronderstelde kolom sleutel resulteert in een enorme verandering van het gedecodeerde bericht. Er was dus geen voor de hand liggende manier om vanuit dit punt de code geheel op te lossen.
+	
+	Een eerste mislukte strategie bestond er uit om te proberen de mono-alfabetische substitutie automatisch op te lossen door er van uit te gaan dat de gegeven tekst exact de distributie van zijn taal volgt. De bedoeling was om deze methode dan toe te passen op de reeks hoogst-scorende kolom sleutels, om dan manueel na te kijken of een van de resultaten op een tekst leek. Deze aanpak om een mono-alfabetische substitutie op te lossen is echter zeer na\"ief en gaf geen zinnige resultaten.
+	
+	Een andere strategie die we hadden bedacht, maar waar we niet de tijd voor hadden om deze tot werking te brengen, was om niet enkel na te gaan hoe goed de letterdistributies pasten aan die van de talen, maar om ook de distributies van \textit{combinaties} van letters te beschouwen. Met dit als doel hebben we tenminste nog geprobeerd om klinkers te identificeren, door het vinden van letters die naast vrijwel elke andere letter voorkomen, maar ook hier kwam weinig uit.\\\\	
+	Ons incomplete, onzekere antwoord is tenslotte als volgt:
+	\begin{itemize}
+		\setlength\itemsep{0pt}
+		\item De kolom sleutel: GFDBEAC
+		\item Taal: Duits
+	\end{itemize}
+	
 	\section{Enigma}
 	Het is ons ook niet gelukt om de enigma code te kraken.\\
 	Eerst hebben we een Enigma machine ge\"{i}mplementeerd. Met behulp van de code en de crib maakten we intern een graaf aan de hand van een dictionary van lijsten. Omdat we geen makkelijk algoritme ken om alle onafhankelijke cycles in een graaf te vinden. Omdat de graaf relatief klein is (24 paden) hebben we die manueel getekent en de cycles op deze figuur aangeduid. Zo bekwamen we volgende graaf. 

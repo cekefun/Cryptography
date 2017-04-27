@@ -344,8 +344,10 @@ def draw(dict, barLength = 100, formatString = '{}'):
         
 def rate_permutations(code, minLength, maxLength = None, skipChance = 0):
     '''
-    A function that gives the results of the above function a rating.
-    The rating correlates with the likelihood of the original text being Vigenère encoded human writing.
+    Tries all possible columnar keys of length in [minLength, maxLength].
+    For each key it tries to decypher the text, it then applies analysis to give the decyphered text a rating.
+    Each key gets rated in this way, and the highest rated keys are printed to the terminal.
+    skipChance gives a way to speed this up (at the cost of some accuracy) by giving the system a chance to skip each key.
     '''
     if maxLength is None:
         maxLength = minLength
@@ -354,23 +356,23 @@ def rate_permutations(code, minLength, maxLength = None, skipChance = 0):
     for length in range(minLength, maxLength + 1):
         # pick a piece of alphabet
         baseKey = Alphabet.alphabet[:length]
-        
+
         # loading bar stuff
         loadBit = 50/math.factorial(length)
         i = 0
         print('Checking', math.factorial(length), 'permutations of length', str(length) + '...')
-        
+
         # run through all its permutations
         for colKey in permutations(baseKey):
             if(skipChance < random.random()):
                 colKey = ''.join(colKey)
-                
+
                 decyphered = Column.decypher(code, colKey)
-                
+
                 bundled = ADFGVX.bundle(decyphered)
                 freq = Frequency.analyse(bundled)
                 mse = Frequency.MSE_all(freq)
-                
+
                 score = score_from_mse(mse)
                 scores[colKey] = score
             
@@ -378,45 +380,45 @@ def rate_permutations(code, minLength, maxLength = None, skipChance = 0):
             while i >= 1:
                 i -= 1
                 print('■', end='', flush=True)
-        print()        
+        print()
     print()
-            
+
     scores = sorted(scores.items(), key=operator.itemgetter(1))
     for key, score in scores[:10]:
         print(key, '\trated a score of', score) 
     print()
     print('{0:.1f} seconds elapsed'.format(time.time() - startTime))
-       
+
 def substitute(text, fro, to):
     out = text
     for i in range(len(text)):
         if out[i] == fro:
             out[i] = to
     return out
-       
+
 def score_from_mse(mse):
     s = 1000
     for l in mse:
         # s += mse[l]
         s = min(s, mse[l])
     return s
-    
+
 def print_mse(mse):
     for l, s in sorted(mse.items(), key=operator.itemgetter(1)):
         print('{:<10}:'.format(l), s)
-    
-    
+
 def main():
     openfile = open('ADFGVX.txt','r')
     code = openfile.read()
     code = Morse.decode(code)
-    
-    # rate_permutations(code, 6)
-    
+
+    rate_permutations(code, 6)
+    rate_permutations(code, 7)
+
     # GFDBEAC
     decolumned = Column.decypher(code, 'EABDFGC')
     bundled = ADFGVX.bundle(decolumned)
-    
+
     print('\n\t ENGLISH:')
     print(''.join(ADFGVX.apply_frequency(bundled, 'english')[:200]))
     print('\n\t GERMAN:')
