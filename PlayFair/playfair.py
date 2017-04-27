@@ -51,7 +51,7 @@ class Playfair:
 				if scores[i] > mini:
 					mini = scores[i]
 					choice = i
-			if(self.MaxScore > mini):
+			if(self.MaxScore >= mini):
 				trips += 1
 				if(self.correct(self.BestResult) or trips == 100):
 					break
