@@ -1,13 +1,65 @@
-\documentclass{article}
+\documentclass[fleqn]{article}
 \usepackage{graphicx}
-\DeclareGraphicsExtensions{.png}
+\usepackage{mathtools}
+\mathtoolsset{showonlyrefs}
+\usepackage{amsmath}
 \usepackage{hyperref}
-\title{Code Theorie}
+\DeclareGraphicsExtensions{.png}
+\title{Verslag Project Codetheorie}
 \date{2017-04-28}
-\author{Siebert Aerts \and C\'{e}dric De Haes}
+\author{Sibert Aerts \and C\'{e}dric De Haes}
 
 \begin{document}
-	\section{VigenerePlus}
+	\maketitle
+	
+	\section{Vigen\`ere Plus}
+	Opgelost door Sibert.\\
+	Ik begon met het wiskundig uitschrijven van de gegeven encryptiemethode: Een Vigen\`ere versleuteling gevolgd door een enkele kolom transpositie. Ik merkte dat er geen voor de hand liggende wiskundige of statistische oplossing was zolang de kolomsleutel (of tenminste de lengte hiervan) en de lengte van de Vigen\'eresleutels onbekend zijn.
+	
+	Om Vigen\`ere op te lossen analyseert men bepaalde attributen van de code: Het herhaaldelijk voorkomen van factoren in de afstanden tussen identieke substrings van 3 karakters, deze herhaalde factoren verklappen de lengte van de sleutel. De kolom transpositie, of het omkeren van de transpositie met een foute sleutel, zorgen er echter voor dat de onderliggende patronen die de analyse blootlegt verborgen worden. Enkel als men een (bijna) juiste sleutel gebruikt om de kolom transpositie om te keren zal men een code verkrijgen waarin men zo patronen kan herkennen.
+	
+	Met dit in gedachte bedacht in een methode om een arbitraire sleutel $k$ een score te geven:
+	\begin{enumerate}
+		\setlength\itemsep{0pt}
+		\item Gebruik de sleutel $k$ om de enkele kolomtranspositie ongedaan te maken.
+		\item Analyseer de resulterende code en gebruik dit om een score te berekenen.
+		\item Associ\"eer deze score met de sleutel $k$.
+	\end{enumerate}
+	Het berekenen van de score in stap 2 gebeurt aan de hand van een heuristiek, in dit geval bedacht ik een simpele score functie: De som van elke factor maal het aantal voorkomens van die factor. Ik paste deze methode toe op een grote hoeveelheid willekeurig gekozen sleutels met lengtes tussen 2 en 10. Uit de scores viel onmiddellijk op dat de sleutels met de hoogste scores lengte 7 hadden, wat aangeeft dat dit waarschijnlijk de correcte sleutellengte is.
+	
+	Nu kennen we echter enkel de lengte, en niet de sleutel zelf. Bij wijze van test nam ik de hoogst scorende sleutel van lengte 7, die niet gegarandeerd was de juiste sleutel te zijn, en voegde het resultaat in de \textit{Vigen\`ere Cracking Tool} \footnote{\url{http://www.simonsingh.net/The_Black_Chamber/vigenere_cracking_tool.html}}. Deze gaf zeer duidelijk aan dat de Vigen\`ere sleutel lengte 14 moest zijn. Dit is een enorm behulpzaam feit want 14 is een veelvoud van 7, wat een speciale eigenschap geeft aan de combinatie Vigen\`ere en kolom transpositie:\\
+	Neem:
+	\begin{equation}
+	\begin{aligned}
+		& c = \text{ de correcte kolom sleutel (lengte 7)}\\
+		& v = \text{de correcte Vigen\`ere sleutel (lengte 14)}	\\
+		& text = \text{de originele text}\\
+		& code = Col_{c} \circ Vig_{v} (text) = \text{de gegeven code}\\
+		& c' = \text{een arbitraire kolom sleutel (lengte 7)} \\
+		& v' = \text{de Vigen\`ere sleutel (lengte 14) gevonden aan de hand van } c' \\
+		& text' = Vig_{v'}^{-1} \circ Col_{c'}^{-1} (code)
+	\end{aligned}
+	\end{equation}	
+	Dan kan men aantonen:
+	\begin{equation}
+	\begin{aligned}
+		&text' \text{ is een permutatie van } text\\
+		&v' \text{ is een permutatie van } v'\\
+		&code' = Col_{c'}(text') = Col_{c'} \circ Vig_{v'}^{-1} \circ Col_{c'}^{-1} (code)\\
+		& = Col_{c'} \circ Vig_{v'}^{-1} \circ Col_{c'}^{-1} \circ Col_{c} \circ Vig_{v} (text) \\
+		& = Col_{c} (text)\\
+	\end{aligned}
+	\end{equation}	
+	Kort gezegd: Het vinden van de meest waarschijnlijke Vigen\`ere sleutel voor een foute kolom sleutel die wel de juiste lengte heeft, staat ons toe om de Vigen`ere geheel teniet te doen. Het resultaat, $code'$, is een tekst die enkel versleuteld is met een kolom transpositie, en aangezien we de lengte van de sleutel kennen is het vinden van de oplossing hiervoor een simpele puzzel die men manueel kan uitvoeren.\\\\	
+	Uiteindelijk vond ik dus:
+	\begin{itemize}
+		\setlength\itemsep{0pt}
+		\item De kolom sleutel: GBDAFCE
+		\item De Vigen\`ere sleutel: SASKIADECOSTER
+	\end{itemize}
+	
+	
+	
 	\section{PlayFair}
 	Het is ons niet gelukt om de PlayFair code te kraken.\\
 	We probeerden dit te doen met behulp van de frequentie-analyse van bigrammen. Eerst hebben we een playfair decoder ge\"{i}mplemeteerd. Deze gaat een code nemen en die decoderen volgens een gegeven vierkant. Deze hebben we nodig omdat de tekst te klein is om brute force de frequentie te nemen van elk bigram in de code te vervangen door het bigram met ongeveer gelijke frequentie. Daarom maken we in de start een random vierkant aan als sleutel en decoderen we de code met behulp van deze decoder. Dan wordt op deze gedecodeerde tekst een score geplakt. Deze score wordt berekend aan de hand van de frequentie-analyse gevonden op \\ \url{https://fusiontables.google.com/DataSource?docid=15jK-3WUD-JjQMdwLe-ipwqkUdjvf2JKK-D-s9as}\\
