@@ -390,6 +390,7 @@ def rate_permutations(code, minLength, maxLength = None, skipChance = 0):
     print('{0:.1f} seconds elapsed'.format(time.time() - startTime))
 
 def substitute(text, fro, to):
+    '''Replace all items `fro` in a list to `to`.'''
     out = text
     for i in range(len(text)):
         if out[i] == fro:
@@ -397,6 +398,10 @@ def substitute(text, fro, to):
     return out
 
 def score_from_mse(mse):
+    '''
+    Get the score from the Mean Squared Error for different languages.
+    Simply returns the lowest MSE.
+    '''
     s = 1000
     for l in mse:
         # s += mse[l]
@@ -412,13 +417,14 @@ def main():
     code = openfile.read()
     code = Morse.decode(code)
 
-    rate_permutations(code, 6)
-    rate_permutations(code, 7)
+    # Uncomment this if you want to see the highest rated column keys
+    # rate_permutations(code, 7)
 
-    # GFDBEAC
-    decolumned = Column.decypher(code, 'EABDFGC')
+    # GFDBEAC is the highest rated key
+    decolumned = Column.decypher(code, 'GFDBEAC')
     bundled = ADFGVX.bundle(decolumned)
 
+    # Naively assume it follows one of these languages' frequency exactly.
     print('\n\t ENGLISH:')
     print(''.join(ADFGVX.apply_frequency(bundled, 'english')[:200]))
     print('\n\t GERMAN:')
