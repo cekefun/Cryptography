@@ -3,6 +3,8 @@ import csv
 import random
 import copy
 from math import log10
+from itertools import permutations
+
 
 class Playfair:
 	stats = {}
@@ -299,26 +301,46 @@ class Playfair:
 def main(filename):
 	PF = Playfair(filename)
 	#PF.crack()
-	key = [['D','I','R','E','C'],['T','O','N']]
+	startkey = [['D','I','R','E','C'],['T','O']]
+	bestkey = []
+	score = -100000000000000000000000
 	alfabet = [chr(i) for i in range(65,91)]
 	alfabet.remove('J')
 
-	for i in key:
+	for i in startkey:
 		for j in i:
 			alfabet.remove(j)
-	random.shuffle(alfabet)
-	al = 0
-	key.append([])
-	key.append([])
-	key.append([])
-	for i in key:
-		while len(i) < 5:
-			i.append(alfabet[al])
-			al += 1
+	startkey.append([])
+	startkey.append([])
+	startkey.append([])
+
+	for comb in permutations(alfabet,4):
+		smallAlfa = alfabet[:]
+		smallAlfa.remove(comb[0])
+		smallAlfa.remove(comb[1])
+		smallAlfa.remove(comb[2])
+		smallAlfa.remove(comb[3])
+		key = copy.deepcopy(startkey)
+		key[1].append(comb[0])
+		key[1].append(comb[1])
+		key[1].append(comb[2])
+		key[2].append(comb[3])
+		al = 0
+		for i in key:
+			while len(i) < 5:
+				i.append(smallAlfa[al])
+				al += 1
+		PF.key = key
+		sc = PF.score()
+		if sc > score:
+			print(sc)
+			score = sc
+			bestkey = key
+
 
 	print(key)
-	PF.key = key
-	PF.decode()
+	PF.key = bestkey
+	PF.decode()	
 	print("".join(PF.decoded))
 
 
