@@ -30,25 +30,25 @@
 	Nu kennen we echter enkel de lengte, en niet de sleutel zelf. Bij wijze van test namen we de hoogst scorende sleutel van lengte 7 (die zeker niet gegarandeerd was de juiste sleutel te zijn) en voegden het resultaat in de \textit{Vigen\`ere Cracking Tool} \footnote{\url{http://www.simonsingh.net/The_Black_Chamber/vigenere_cracking_tool.html}}. Deze gaf zeer duidelijk aan dat de Vigen\`ere sleutel lengte 14 moest zijn. Dit is een enorm behulpzaam feit want 14 is een veelvoud van 7, wat een speciale eigenschap geeft aan de combinatie Vigen\`ere en kolom transpositie:\\
 	Neem:
 	\begin{equation}
-		\begin{aligned}
-			& c = \text{ de correcte kolom sleutel (lengte 7)}\\
-			& v = \text{de correcte Vigen\`ere sleutel (lengte 14)}	\\
-			& text = \text{de originele text}\\
-			& code = Col_{c} \circ Vig_{v} (text) = \text{de gegeven code}\\
-			& c' = \text{een arbitraire kolom sleutel (lengte 7)} \\
-			& v' = \text{de Vigen\`ere sleutel (lengte 14) gevonden aan de hand van } c' \\
-			& text' = Vig_{v'}^{-1} \circ Col_{c'}^{-1} (code)
-		\end{aligned}
+	\begin{aligned}
+	& c = \text{ de correcte kolom sleutel (lengte 7)}\\
+	& v = \text{de correcte Vigen\`ere sleutel (lengte 14)}	\\
+	& text = \text{de originele text}\\
+	& code = Col_{c} \circ Vig_{v} (text) = \text{de gegeven code}\\
+	& c' = \text{een arbitraire kolom sleutel (lengte 7)} \\
+	& v' = \text{de Vigen\`ere sleutel (lengte 14) gevonden aan de hand van } c' \\
+	& text' = Vig_{v'}^{-1} \circ Col_{c'}^{-1} (code)
+	\end{aligned}
 	\end{equation}	
 	Dan kan men aantonen dat omwille van de lengtes van $c$ en $v$:
 	\begin{equation}
-		\begin{aligned}
-			&text' \text{ is een permutatie van } text\\
-			&v' \text{ is een permutatie van } v\\
-			&code' = Col_{c'}(text') = Col_{c'} \circ Vig_{v'}^{-1} \circ Col_{c'}^{-1} (code)\\
-			& = Col_{c'} \circ Vig_{v'}^{-1} \circ Col_{c'}^{-1} \circ Col_{c} \circ Vig_{v} (text) \\
-			& = Col_{c} (text)\\
-		\end{aligned}
+	\begin{aligned}
+	&text' \text{ is een permutatie van } text\\
+	&v' \text{ is een permutatie van } v\\
+	&code' = Col_{c'}(text') = Col_{c'} \circ Vig_{v'}^{-1} \circ Col_{c'}^{-1} (code)\\
+	& = Col_{c'} \circ Vig_{v'}^{-1} \circ Col_{c'}^{-1} \circ Col_{c} \circ Vig_{v} (text) \\
+	& = Col_{c} (text)\\
+	\end{aligned}
 	\end{equation}	
 	Kort gezegd: Het vinden van de meest waarschijnlijke Vigen\`ere sleutel voor een foute kolom sleutel die wel de juiste lengte heeft, staat ons toe om de Vigen`ere geheel teniet te doen. Het resultaat, $code'$, is een tekst die enkel versleuteld is met een kolom transpositie, en aangezien we de lengte van de sleutel kennen is het vinden van de oplossing hiervoor een simpele puzzel die we makkelijk manueel konden uitvoeren.\\\\	
 	Uiteindelijk vonden we dus:
@@ -63,8 +63,8 @@
 	\section{PlayFair}
 	Het is ons niet gelukt om de PlayFair code te kraken.\\
 	We probeerden dit te doen met behulp van de frequentie-analyse van bigrammen. Eerst hebben we een playfair decoder ge\"{i}mplemeteerd. Deze gaat een code nemen en die decoderen volgens een gegeven vierkant. Deze hebben we nodig omdat de tekst te klein is om brute force de frequentie te nemen van elk bigram in de code te vervangen door het bigram met ongeveer gelijke frequentie. Daarom maken we in de start een random vierkant aan als sleutel en decoderen we de code met behulp van deze decoder. Dan wordt op deze gedecodeerde tekst een score geplakt. Deze score wordt berekend aan de hand van de frequentie-analyse gevonden op \textit{fusiontables}\footnote{\url{https://fusiontables.google.com/DataSource?docid=15jK-3WUD-JjQMdwLe-ipwqkUdjvf2JKK-D-s9as}} We hebben eerst geprobeerd dit te doen met de 30 meest voorkomende bigrammen volgens \textit{practicalcryptography}\footnote{\url{http://practicalcryptography.com/cryptanalysis/letter-frequencies-various-languages/}}, maar dit was onvoldoende.
-	Vanuit die tabel worden de frequenties van alle bigrammen berekend. De frequenties van bigrammen met een J worden opgeteld met die van overeenkomstige bigrammen met een I. Voor de dubbele letters in de tabel gaan we al de mogelijkheden gelijk stellen. Dit wil zeggen: AX en XA hebben dezelfde frequentie: XA + AX + AA. Dit doen we omdat de computer niet kan weten of het gaat om een dubbele letter of een enkele letter met een X. Dit moeten we zelf na gaan.\\
-	De score wordt berekend door de som te nemen van de 10 log van de frequenties de bigrammen in de gedecodeerde tekst.
+	Vanuit die tabel worden de frequenties van alle bigrammen berekend. Wel hebben we daaruit besloten om te zoeken naar een Engelse tekst. Engels gaf ons namelijk de hoogste score. De frequenties van bigrammen met een J worden opgeteld met die van overeenkomstige bigrammen met een I. Voor de dubbele letters in de tabel gaan we al de mogelijkheden gelijk stellen. Dit wil zeggen: AX en XA hebben dezelfde frequentie: XA + AX + AA. Dit doen we omdat de computer niet kan weten of het gaat om een dubbele letter of een enkele letter met een X. Dit moeten we zelf na gaan.\\
+	De score wordt berekend door de som te nemen van de 10 log van de frequenties de bigrammen in de gedecodeerde tekst. We gebruiken de 10 log om de relatief grote kansen heel erg zwaar te laten doorwegen.
 	Deze score wordt dat vergeleken met de score van enkele andere dichtbijzijnde sleutels:
 	\begin{enumerate}
 		\item 1 rij omhoog
@@ -98,7 +98,7 @@
 		\hline 
 	\end{tabular} 
 	\\
-	Daaraan leek het ons duidelijk dat het codewoord "DIRECTION" of "DIRECTOR" zou kunnen bevatten.
+	Daaraan leek het ons duidelijk dat het codewoord "DIRECTION" of "DIRECTOR" zou kunnen bevatten. We denken dat dit ons op een dwaalspoor heeft gezet en veel te veel tijd heeft ingenomen.
 	\section{ADFVGX}
 	Het is ons niet gelukt om de ADFVGX code te kraken.\\
 	Onze aanpak was vergelijkbaar aan die voor de Vigen\`ere op te lossen: Eerst proberen de lengte van de kolom sleutel te vinden, en daarna proberen de eigenlijke ADFGVX substitutie te ontdekken. Net als bij de Vigen\`ere code begon deze aanpak met het opstellen van een score-functie voor het testen van de mogelijke correctheid van een sleutel die we willen gebruiken voor het omkeren van de kolom transpositie. Aangezien de interne encryptie niet langer Vigen\`ere is, maar een willekeurige mono-alfabetische substitutie, besloten we om niet dezelfde analyse te gebruiken. In de plaats daarvan hebben we gebruik gemaakt van data over de distributies van individuele letters in de gegeven talen (Engels, Duits, Frans en Nederlands), en gebruikten we de \textit{Mean Squared Error} om deze te vergelijken met de distributie die we vonden in de verkregen code.
