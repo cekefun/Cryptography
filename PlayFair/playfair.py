@@ -2,6 +2,7 @@ import sys
 import csv
 import random
 import copy
+from math import log10
 
 class Playfair:
 	stats = {}
@@ -35,7 +36,7 @@ class Playfair:
 
 		while True:
 			print(trips)
-			possibles = [self.up(),self.down(),self.left(),self.right(),self.turnRow(),self.turnCol(),self.switchRows(),self.switchCols(),self.swap2(),self.swap2(5), self.swap2(2),self.swap3()]
+			possibles = [self.up(),self.down(),self.left(),self.right(),self.turnRow(),self.turnCol(),self.switchRows(),self.switchCols(),self.swap2(),self.swap2(5), self.swap2(2),self.swap3(),self.sortLast()]
 			scores = []
 			for matrix in possibles:
 				self.key = matrix
@@ -46,14 +47,14 @@ class Playfair:
 			print(self.MaxScore)
 
 			choice = 0
-			mini = 0
+			mini = -100000000000000000000000000000000000
 			for i in range(len(scores)):
 				if scores[i] > mini:
 					mini = scores[i]
 					choice = i
 			if(self.MaxScore >= mini):
 				trips += 1
-				if(self.correct(self.BestResult) or trips == 100):
+				if(trips == 100):
 					break
 			else:
 				trips = 0
@@ -85,14 +86,14 @@ class Playfair:
 			bigram, chance = row
 			self.stats[bigram] = float(chance)
 
+		#remove J
 		toDelete = []
-		for p in self.stats.keys():
+		for p in self.stats:
 			if len(p) != 2:
-					return false
+				return False
 			if p == "JJ":
-				chance = self.stats[p]/2
-				self.stats["IX"] += chance
-				self.stats["XI"] += chance
+				chance = self.stats[p]
+				self.stats["II"] += chance
 				toDelete.append(p)
 				continue
 			if p[0] == 'J':
@@ -101,14 +102,32 @@ class Playfair:
 			if p[1] == 'J':
 				self.stats[p[0] + 'I'] += self.stats[p]
 				toDelete.append(p)
+
+		for item in toDelete:
+			del(self.stats[item])
+
+		#remove doubles
+		toDelete = []
+		for p in self.stats.keys():
+			if len(p) != 2:
+					return false
 			if p[0] == p[1]:
-				chance = self.stats[p]/2
-				self.stats[p[0]+"X"]+= chance
-				self.stats["X"+p[1]]+= chance
+				chance = self.stats[p]
+				self.stats[p[0]+"X"]+= chance + self.stats["X"+p[1]]
+				self.stats["X"+p[1]]+= chance + self.stats[p[0]+"X"]
 				toDelete.append(p)
 
 		for item in toDelete:
 			del(self.stats[item])
+		
+		for p in self.stats:
+			self.stats[p] = log10(self.stats[p])
+		'''
+		with open('myStats.csv', 'w') as csvfile:
+			writer = csv.DictWriter(csvfile,['bigram', 'value'])
+			for i in self.stats:
+				writer.writerow({'bigram': i, 'value': self.stats[i]})
+		'''
 
 	def decode(self):
 		self.decoded = []
@@ -167,7 +186,7 @@ class Playfair:
 		return result
 
 	def left(self):
-		#moves the squre one column left
+		#moves the square one column left
 		result=[]
 		for i in range(5):
 			result.append([])
@@ -186,7 +205,7 @@ class Playfair:
 
 	def turnRow(self):
 		# reflects a random row
-		result = self.key
+		result = copy.deepcopy(self.key)
 		row = random.randint(0,4)
 		for i in range(2):
 			temp  = result[row][i]
@@ -196,7 +215,7 @@ class Playfair:
 
 	def turnCol(self):
 		# reflects a random column
-		result = self.key
+		result = copy.deepcopy(self.key)
 		col = random.randint(0,4)
 		for i in range(2):
 			temp  = result[i][col]
@@ -206,7 +225,7 @@ class Playfair:
 
 	def switchRows(self):
 		#switches 2 random rows
-		result = self.key
+		result = copy.deepcopy(self.key)
 		row0 = random.randint(0,4)
 		row1 = row0
 		while row1==row0:
@@ -219,7 +238,7 @@ class Playfair:
 
 	def switchCols(self):
 		#switches 2 random columns
-		result = self.key
+		result = copy.deepcopy(self.key)
 		col0 = random.randint(0,4)
 		col1 = col0
 		while col1==col0:
@@ -268,7 +287,10 @@ class Playfair:
 		result[pair3[0]][pair3[1]] = temp
 		return result
 
-
+	def sortLast(self):
+		result = copy.deepcopy(self.key)
+		result[-1] = sorted(result[-1])
+		return result
 
 
 
@@ -276,7 +298,30 @@ class Playfair:
 
 def main(filename):
 	PF = Playfair(filename)
-	PF.crack()
+	#PF.crack()
+	key = [['D','I','R','E','C'],['T','O','N']]
+	alfabet = [chr(i) for i in range(65,91)]
+	alfabet.remove('J')
+
+	for i in key:
+		for j in i:
+			alfabet.remove(j)
+	random.shuffle(alfabet)
+	al = 0
+	key.append([])
+	key.append([])
+	key.append([])
+	for i in key:
+		while len(i) < 5:
+			i.append(alfabet[al])
+			al += 1
+
+	print(key)
+	PF.key = key
+	PF.decode()
+	print("".join(PF.decoded))
+
+
 
 
 if __name__ == "__main__":
