@@ -255,6 +255,9 @@ def main():
     openfile = open('Vigenereplus.txt', 'r')
     code = openfile.read()
 
+    # Uncomment this if you want to see the highest rated column keys
+    # rate_permutations(code, 7)
+
     # amount of characters to print
     charCount = 100
 
